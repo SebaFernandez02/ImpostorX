@@ -69,6 +69,7 @@ Gradle 8.7 · AGP 8.5.0 (Android Studio Koala)
 minSdk 23 · compile/targetSdk 34
 
 ### 🗂️ Estructura
+```
 app/  
  ├─ src/main/assets/palabras/       # JSON por categoría  
  │    ├─ deportistas.json           # Deportes  
@@ -91,7 +92,7 @@ app/
               ├─ ImpostorCountScreen.kt  
               ├─ RevealRoundScreen.kt  
               └─ RoundReadyScreen.kt  
-
+```
 ### 🔀 Flujo de pantallas
 
 Home – “Toca para continuar”.
