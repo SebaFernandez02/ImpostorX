@@ -41,19 +41,19 @@ Gradle 8.7 · AGP 8.5.0 (Android Studio Koala)
 minSdk 23 · target/compileSdk 34 · JDK 17
 
 ### 🗂️ Estructura de proyecto
-app/
- ├─ src/main/assets/palabras/       # JSON por categoría
- │    ├─ deportistas.json           # Deportes
- │    ├─ futbolistas.json           # Fútbol
- │    ├─ artistas.json              # Artistas
- │    ├─ paises.json                # Geografía
- │    ├─ peliculas.json             # Cine
- │    └─ random.json                # Random (unión de todo)
- └─ src/main/java/com/example/impostorx/
-      ├─ data/
-      │   └─ WordsRepository.kt     # Carga/parseo JSON por categoría
-      ├─ logic/
-      │   └─ GameViewModel.kt      
+app/  
+ ├─ src/main/assets/palabras/       # JSON por categoría  
+ │    ├─ deportistas.json           # Deportes  
+ │    ├─ futbolistas.json           # Fútbol  
+ │    ├─ artistas.json              # Artistas  
+ │    ├─ paises.json                # Geografía  
+ │    ├─ peliculas.json             # Cine  
+ │    └─ random.json                # Random (unión de todo)  
+ └─ src/main/java/com/example/impostorx/  
+      ├─ data/  
+      │   └─ WordsRepository.kt     # Carga/parseo JSON por categoría  
+      ├─ logic/  
+      │   └─ GameViewModel.kt        
 
 Tú dijiste:
 pero hacemelo formato .md para poder pegarlo y que quede bien, estaba bien lo que estabas haciendo pero hacelo en formato .md
