@@ -40,29 +40,6 @@ Gradle 8.7 · AGP 8.5.0 (Android Studio Koala)
 
 minSdk 23 · target/compileSdk 34 · JDK 17
 
-### 🗂️ Estructura de proyecto
-app/  
- ├─ src/main/assets/palabras/       # JSON por categoría  
- │    ├─ deportistas.json           # Deportes  
- │    ├─ futbolistas.json           # Fútbol  
- │    ├─ artistas.json              # Artistas  
- │    ├─ paises.json                # Geografía  
- │    ├─ peliculas.json             # Cine  
- │    └─ random.json                # Random (unión de todo)  
- └─ src/main/java/com/example/impostorx/  
-      ├─ data/  
-      │   └─ WordsRepository.kt     # Carga/parseo JSON por categoría  
-      ├─ logic/  
-      │   └─ GameViewModel.kt        
-
-Tú dijiste:
-pero hacemelo formato .md para poder pegarlo y que quede bien, estaba bien lo que estabas haciendo pero hacelo en formato .md
-ChatGPT Plus
-Pensó durante 27s
-ImpostorX (Android · Jetpack Compose)
-
-Juego social tipo “el impostor” pensado para jugar pasando el celular. Hecho con Kotlin + Jetpack Compose, navegación declarativa y estado centralizado en un ViewModel. Las palabras se leen de JSON en assets/ por categoría y se barajan en cada partida.
-
 ### ✨ Características
 
 Flujo guiado: Home → Nombres → Categorías → Impostores → Revelado → Listo para jugar
@@ -92,28 +69,28 @@ Gradle 8.7 · AGP 8.5.0 (Android Studio Koala)
 minSdk 23 · compile/targetSdk 34
 
 ### 🗂️ Estructura
-app/
- ├─ src/main/assets/palabras/       # JSON por categoría
- │    ├─ deportistas.json           # Deportes
- │    ├─ futbolistas.json           # Fútbol
- │    ├─ artistas.json              # Artistas
- │    ├─ paises.json                # Geografía
- │    ├─ peliculas.json             # Cine (nuevo)
- │    └─ random.json                # Random (unión de todos)
- └─ src/main/java/com/example/impostorx/
-      ├─ data/
-      │   └─ WordsRepository.kt     # Carga/parseo JSON por categoría
-      ├─ logic/
-      │   └─ GameViewModel.kt       # Estado global de partida/ronda
-      └─ ui/
-          ├─ ImpostorApp.kt         # NavHost + rutas
-          └─ screens/
-              ├─ ImpostorHome.kt
-              ├─ ImpostorRoomScreen.kt
-              ├─ CategoriesScreen.kt
-              ├─ ImpostorCountScreen.kt
-              ├─ RevealRoundScreen.kt
-              └─ RoundReadyScreen.kt
+app/  
+ ├─ src/main/assets/palabras/       # JSON por categoría  
+ │    ├─ deportistas.json           # Deportes  
+ │    ├─ futbolistas.json           # Fútbol  
+ │    ├─ artistas.json              # Artistas  
+ │    ├─ paises.json                # Geografía  
+ │    ├─ peliculas.json             # Cine (nuevo)  
+ │    └─ random.json                # Random (unión de todos)  
+ └─ src/main/java/com/example/impostorx/  
+      ├─ data/  
+      │   └─ WordsRepository.kt     # Carga/parseo JSON por categoría  
+      ├─ logic/  
+      │   └─ GameViewModel.kt       # Estado global de partida/ronda  
+      └─ ui/  
+          ├─ ImpostorApp.kt         # NavHost + rutas  
+          └─ screens/  
+              ├─ ImpostorHome.kt  
+              ├─ ImpostorRoomScreen.kt  
+              ├─ CategoriesScreen.kt  
+              ├─ ImpostorCountScreen.kt  
+              ├─ RevealRoundScreen.kt  
+              └─ RoundReadyScreen.kt  
 
 ### 🔀 Flujo de pantallas
 
