@@ -14,7 +14,6 @@ object Routes {
     const val Room = "room"
     const val Categories = "categories/{total}"              // recibe total de jugadores
     const val Impostors = "impostors/{total}/{category}"     // recibe total + categoría
-    const val Game = "game/{category}/{impostors}"           // pantalla siguiente
     const val Reveal = "reveal"
     const val RoundReady = "roundReady"   //
 
@@ -58,22 +57,23 @@ fun ImpostorApp() {
 
         composable(Routes.Impostors) { backStack ->
             val cat = backStack.arguments?.getString("category") ?: "Random"
-
             val ctx = LocalContext.current
+
             ImpostorCountScreen(
                 totalPlayers = gameVm.playersCount(),
                 category = cat,
                 onBack = { nav.navigateUp() },
-                onConfirm = { impostors, _ ->
-                    gameVm.setImpostors(impostors)
+                onConfirm = { _, _ ->
                     gameVm.startMatch(ctx) {
-                        nav.navigate(Routes.Reveal)
+                        nav.navigate(Routes.Reveal) {
+                            launchSingleTop = true
+                        }
                     }
                 },
                 gameVm = gameVm
             )
-
         }
+
 
         composable(Routes.Reveal) {
             RevealRoundScreen(
@@ -82,6 +82,7 @@ fun ImpostorApp() {
                     val total = gameVm.playersCount()
                     val cat = gameVm.selectedCategorySlug()
                     gameVm.resetRoundState()
+                    gameVm.resetImpostorSet()
                     nav.navigate("impostors/$total/$cat") {
                         popUpTo(Routes.Reveal) { inclusive = true }
                         launchSingleTop = true

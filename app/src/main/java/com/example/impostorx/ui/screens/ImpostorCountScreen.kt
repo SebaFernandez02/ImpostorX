@@ -139,15 +139,16 @@ fun ImpostorCountScreen(
         Spacer(Modifier.height(8.dp))
         Button(
             onClick = {
-                val final = if (random) (1..maxImpostors).random() else selected
-                onConfirm(final, category)
+                val final = if (random) (1..totalPlayers).random() else selected
+                // <-- guardar en el VM el modo elegido
+                gameVm.setImpostorsRandomEnabled(random)
+                gameVm.setImpostors(final)
+
+                onConfirm(final, category) // navega como ya tenías
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .imePadding() // por si aparece el teclado
-        ) {
-            Text("Listo")
-        }
+            modifier = Modifier.fillMaxWidth().imePadding()
+        ) { Text("Listo") }
+
     }
 }
 

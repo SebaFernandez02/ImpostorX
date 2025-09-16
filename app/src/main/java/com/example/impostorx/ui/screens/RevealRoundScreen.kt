@@ -32,6 +32,7 @@ fun RevealRoundScreen(
     LaunchedEffect(Unit) {
         gameVm.resetRoundState()
         gameVm.ensureWordsLoaded(ctx)
+        gameVm.setImpostors(if (gameVm.isImpostorRandomEnabled()) (1 .. gameVm.playersCount()).random() else gameVm.getImpostors())
         gameVm.startRound()
     }
 
