@@ -43,17 +43,23 @@ fun ImpostorApp() {
             )
         }
 
-        composable(Routes.Categories) { backStack ->
-            val total = backStack.arguments?.getInt("total") ?: 1
+        composable(Routes.Categories) {
             CategoriesScreen(
+                totalPlayers = gameVm.playersCount(),
                 onBack = { nav.navigateUp() },
-                onCategorySelected = { catSlug ->
-                    gameVm.selectCategory(WordsRepository.Category.valueOf(catSlug))
-                    nav.navigate("impostors/$total/$catSlug")
-                },
-                gameVm = gameVm
+                onCategorySelected = { slug ->
+                    // Actualizás el VM acá
+                    gameVm.selectCategory(WordsRepository.Category.valueOf(slug))
+                    var total = gameVm.playersCount()
+                    // Navegás a la siguiente pantalla con ese dato
+                    nav.navigate("impostors/$total/$slug") {
+                        popUpTo(Routes.Reveal) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
+
 
         composable(Routes.Impostors) { backStack ->
             val cat = backStack.arguments?.getString("category") ?: "Random"
