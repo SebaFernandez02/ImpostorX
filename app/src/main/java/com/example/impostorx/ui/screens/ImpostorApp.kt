@@ -109,6 +109,7 @@ fun ImpostorApp() {
                         popUpTo(Routes.RoundReady) { inclusive = true }
                         launchSingleTop = true
                     }
+                    gameVm.reshuffleForNewMatch()
                 },
                 onPlayAgain = {
                     // misma config (jugadores/categoría/impostores), pero partida nueva
