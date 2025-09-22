@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.impostorx.ui.components.ScreenTopBar
 
 @Composable
 fun RoundReadyScreen(
@@ -27,15 +28,7 @@ fun RoundReadyScreen(
             .background(Color.Black)
             .padding(16.dp)
     ) {
-        // Flecha (arriba-izquierda para mantener coherencia con tus pantallas)
-        Text(
-            "←",
-            color = Color.White,
-            modifier = Modifier
-                .background(Color(0x22FFFFFF), RoundedCornerShape(8.dp))
-                .clickable { onBackToImpostors() }
-                .padding(horizontal = 12.dp, vertical = 8.dp)
-        )
+
 
         Spacer(Modifier.height(24.dp))
 

@@ -32,6 +32,7 @@ import com.example.impostorx.logic.GameViewModel
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalView
+import com.example.impostorx.ui.components.ScreenTopBar
 
 @Composable
 fun RevealRoundScreen(
@@ -98,24 +99,6 @@ private fun RevealLayout(
             .padding(16.dp)
     ) {
         // Top bar
-        Row(
-            Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                "←",
-                color = Color.White,
-                modifier = Modifier
-                    .background(Color(0x22FFFFFF), RoundedCornerShape(8.dp))
-                    .clickable { onBack() }
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
-            )
-            Spacer(Modifier.weight(1f))
-
-        }
-
-        Spacer(Modifier.height(16.dp))
-
 
 
         Spacer(Modifier.height(16.dp))
