@@ -190,12 +190,6 @@ RoundReady
 
 ### ✅ TODO / Ideas futuras
 
-Animaciones (fade/slide) en el revelado e indicadores de progreso.
-
-Temporizador y fase de discusión/votación.
-
-Persistencia ligera (última partida) y estadísticas.
-
 Multi-idioma.
 
 ### 📄 Licencia
