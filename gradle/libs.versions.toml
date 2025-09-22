@@ -19,7 +19,9 @@ navigation = "2.7.7"   # estable y compatible con compileSdk 34 / AGP 8.5
 
 
 [libraries]
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
+
 
 androidx-foundation = { module = "androidx.compose.foundation:foundation" }
 

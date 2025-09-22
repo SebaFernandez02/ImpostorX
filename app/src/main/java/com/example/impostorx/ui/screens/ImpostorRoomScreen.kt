@@ -1,237 +1,305 @@
+// ImpostorRoomScreen.kt
 package com.example.impostorx.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.DeleteSweep
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import com.example.impostorx.logic.GameViewModel
+import kotlin.random.Random
 
-
+@OptIn(ExperimentalLayoutApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun ImpostorRoomScreen(
     onBack: () -> Unit,
-    onContinue: (totalPlayers: List<String>) -> Unit,
+    onContinue: (players: List<String>) -> Unit,
     gameVm: GameViewModel
-){
-    var input by rememberSaveable { mutableStateOf("") }
+) {
+    val focus = LocalFocusManager.current
+
+    // Estado local (se lo pasás al VM al continuar)
     val names = remember { mutableStateListOf<String>() }
-    var error by remember { mutableStateOf<String?>(null) }
+    var input by rememberSaveable { mutableStateOf("") }
+    var error by rememberSaveable { mutableStateOf<String?>(null) }
+    var showConfirmClear by rememberSaveable { mutableStateOf(false) }
 
-    val listState = rememberLazyListState()
-    val scope = rememberCoroutineScope()
+    val focusRequester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
 
-    fun send() {
-        val t = input.trim()
-        if (t.isEmpty()) return
-        val existsIdx = names.indexOfFirst { it.equals(t, ignoreCase = true) }
-        if (existsIdx >= 0) {
-            error = "Ese nombre ya existe"
-            scope.launch { listState.animateScrollToItem(existsIdx) }
-        } else {
-            names.add(t)
+    fun normalizeName(raw: String) =
+        raw.trim().replace(Regex("\\s+"), " ").replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+
+    fun tryAdd() {
+        val n = normalizeName(input)
+        error = when {
+            n.isBlank() -> "Escribí un nombre"
+            n.length > 24 -> "Máximo 24 caracteres"
+            names.any { it.equals(n, ignoreCase = true) } -> "Ese nombre ya está"
+            else -> null
+        }
+        if (error == null) {
+            names += n
             input = ""
-            error = null
-            scope.launch { listState.animateScrollToItem(names.lastIndex) }
+            // 🔁 seguir tipeando sin tocar el campo
+            focusRequester.requestFocus()
+            keyboard?.show()
         }
     }
+
+    fun remove(name: String) { names.remove(name) }
+    fun clearAll() { names.clear() }
+
+    val canContinue = names.size >= 3 // regla mínima sugerida
+    val headerGradient = Brush.linearGradient(listOf(Color(0xFF111111), Color(0xFF0A0A0A)))
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-            .padding(16.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
-        // Top bar (← vuelve)
+        // Top bar
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                "←",
-                color = Color.White,
-                modifier = Modifier
-                    .border(1.dp, Color.LightGray, RoundedCornerShape(6.dp))
-                    .clickable { onBack() }
-                    .padding(horizontal = 10.dp, vertical = 6.dp)
-            )
-            Spacer(Modifier.width(8.dp))
-            Text(
-                "Impostor",
-                style = MaterialTheme.typography.titleLarge,
-                color = Color.White,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
-
-        Spacer(Modifier.height(12.dp))
-
-        // Caja grande (lista)
-        Box(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
-                .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
-                .background(Color(0xFF111111), RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(12.dp))
+                .background(headerGradient)
                 .padding(8.dp)
         ) {
-            LazyColumn(
-                state = listState,
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                itemsIndexed(
-                    items = names,
-                    key = { index, name -> "$name-$index" }
-                ) { index, name ->
+            IconButton(onClick = onBack) {
+                Icon(Icons.Rounded.ArrowBack, contentDescription = "Volver", tint = Color.White)
+            }
+            Spacer(Modifier.width(6.dp))
+            Text(
+                text = "Jugadores",
+                color = Color.White,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.weight(1f)
+            )
+            // Borrar todo (solo si hay nombres)
+            AnimatedVisibility(visible = names.isNotEmpty()) {
+                TextButton(onClick = { showConfirmClear = true }) {
+                    Icon(Icons.Rounded.DeleteSweep, contentDescription = null, tint = Color(0xFFFF6B6B))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Borrar todo", color = Color(0xFFFF6B6B))
+                }
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        // Input + botón agregar
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(14.dp))
+                .background(Color(0xFF111111))
+                .border(1.dp, Color(0x22FFFFFF), RoundedCornerShape(14.dp))
+                .padding(6.dp)
+        ) {
+            TextField(
+                value = input,
+                onValueChange = {
+                    // (Opcional) si el usuario escribe coma o Enter, agregá automáticamente
+                    if (it.endsWith('\n') || it.endsWith(',')) {
+                        input = it.trimEnd('\n', ',')
+                        tryAdd()
+                    } else {
+                        input = it
+                        if (error != null) error = null
+                    }
+                },
+                placeholder = { Text("Escribe un nombre…", color = Color(0x66FFFFFF)) },
+                singleLine = true,
+                isError = error != null,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 6.dp)
+                    .focusRequester(focusRequester),         // 👈 importante
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    cursorColor = Color.White,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    errorContainerColor = Color.Transparent,
+                    errorIndicatorColor = Color.Transparent,
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    errorTextColor = Color.White
+                ),
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done,
+                    capitalization = KeyboardCapitalization.Words
+                ),
+                keyboardActions = KeyboardActions(onDone = { tryAdd() })
+            )
+
+            Spacer(Modifier.width(6.dp))
+
+            FilledIconButton(
+                onClick = { tryAdd() },         // 👈 vuelve a enfocar adentro de tryAdd
+                modifier = Modifier.size(44.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = IconButtonDefaults.filledIconButtonColors(containerColor = Color(0xFF2ECC71))
+            ) { Icon(Icons.Rounded.Add, contentDescription = "Agregar", tint = Color.Black)}
+        }
+        AnimatedVisibility(visible = error != null) {
+            Text(error.orEmpty(), color = Color(0xFFFF6B6B), modifier = Modifier.padding(top = 6.dp))
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        // Chips de nombres (wrap)
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            color = Color(0xFF0E0E0E),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            if (names.isEmpty()) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Agrega al menos 3 jugadores", color = Color(0x66FFFFFF))
+                }
+            } else {
+                Column(Modifier.fillMaxSize().padding(12.dp)) {
+                    // contador + barajar opcional
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = name,
+                            "${names.size} jugador${if (names.size == 1) "" else "es"}",
                             color = Color.White,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            style = MaterialTheme.typography.titleMedium
                         )
+                        Spacer(Modifier.weight(1f))
                         Text(
-                            text = "✕",
-                            color = Color.LightGray,
+                            "Barajar",
+                            color = Color(0xFF66D1FF),
                             modifier = Modifier
-                                .border(1.dp, Color.LightGray, RoundedCornerShape(6.dp))
-                                .clickable { names.removeAt(index) } // borrar individual
-                                .padding(horizontal = 10.dp, vertical = 4.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable {
+                                    // shuffle in-place
+                                    val shuffled = names.shuffled(Random(System.currentTimeMillis()))
+                                    names.clear(); names.addAll(shuffled)
+                                }
+                                .padding(horizontal = 10.dp, vertical = 6.dp)
                         )
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        names.forEach { name ->
+                            PlayerChip(name = name, onRemove = { remove(name) })
+                        }
                     }
                 }
             }
         }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(14.dp))
 
-        // Input + botón enviar (→)
-        val canSend = input.trim().isNotEmpty() &&
-                names.none { it.equals(input.trim(), ignoreCase = true) }
-
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            OutlinedTextField(
-                value = input,
-                onValueChange = {
-                    input = it
-                    error = null
-                },
-                modifier = Modifier
-                    .weight(1f)
-                    .onKeyEvent { ev ->
-                        if (ev.type == KeyEventType.KeyUp && ev.key == Key.Enter) {
-                            send(); true
-                        } else false
-                    },
-                singleLine = true,
-                placeholder = { Text("Escribe…", color = Color.Gray) },
-
-                // 👉 texto blanco
-                textStyle = TextStyle(color = Color.White),
-
-                // (opcional) colores del TextField para dark theme
-                colors = TextFieldDefaults.colors(
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                    disabledTextColor = Color.LightGray,
-                    cursorColor = Color.White,
-                    focusedIndicatorColor = Color.LightGray,
-                    unfocusedIndicatorColor = Color.Gray,
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedPlaceholderColor = Color.Gray,
-                    unfocusedPlaceholderColor = Color.Gray
-                ),
-
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Send,
-                    keyboardType = KeyboardType.Text
-                ),
-                keyboardActions = KeyboardActions(
-                    onSend = { send() },
-                    onDone = { send() }
-                )
-            )
-            Spacer(Modifier.width(8.dp))
-            Text(
-                "→",
-                color = if (canSend) Color.White else Color.Gray,
-                modifier = Modifier
-                    .border(
-                        1.dp,
-                        if (canSend) Color.LightGray else Color.DarkGray,
-                        RoundedCornerShape(6.dp)
-                    )
-                    .clickable(enabled = canSend) { send() } // botón enviar
-                    .padding(horizontal = 12.dp, vertical = 10.dp)
-            )
-        }
-
-        // Mensaje de error (duplicado)
-        if (error != null) {
-            Spacer(Modifier.height(6.dp))
-            Text(
-                error!!,
-                color = Color(0xFFFF6B6B),
-                fontSize = 12.sp
-            )
-        }
-
-        Spacer(Modifier.height(12.dp))
-
-        // Botones inferiores
-        Row(
+        // Botón continuar
+        Button(
+            onClick = {
+                gameVm.setPlayers(names.toList())
+                onContinue(names.toList())
+            },
+            enabled = canContinue,
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            shape = RoundedCornerShape(12.dp)
         ) {
-            Button(onClick = {
-                names.clear()
-                error = null
-            }) { Text("Borrar") }
-
-            Button(onClick = { onContinue(names.toList()) }) { Text("Listo") }
-
+            Text(
+                if (canContinue) "Listo" else "Agrega mínimo 3",
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
+    }
+
+    // Confirmación borrar todo
+    if (showConfirmClear) {
+        AlertDialog(
+            onDismissRequest = { showConfirmClear = false },
+            title = { Text("Borrar todos los jugadores") },
+            text = { Text("Esta acción eliminará la lista completa.") },
+            confirmButton = {
+                TextButton(onClick = { showConfirmClear = false; clearAll() }) {
+                    Text("Borrar", color = Color(0xFFFF6B6B))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showConfirmClear = false }) {
+                    Text("Cancelar")
+                }
+            },
+            containerColor = Color(0xFF161616)
+        )
     }
 }
 
+@Composable
+private fun PlayerChip(name: String, onRemove: () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .clip(RoundedCornerShape(999.dp))
+            .background(Color(0xFF1A1A1A))
+            .border(1.dp, Color(0x22FFFFFF), RoundedCornerShape(999.dp))
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+    ) {
+        Text(name, color = Color.White, modifier = Modifier.padding(end = 6.dp))
+        Icon(
+            imageVector = Icons.Rounded.Close,
+            contentDescription = "Eliminar",
+            tint = Color(0xFFBBBBBB),
+            modifier = Modifier
+                .size(16.dp)
+                .clickable { onRemove() }
+        )
+    }
+}
 
-@Preview(showSystemUi = true, showBackground = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun PreviewImpostorRoom() {
-    ImpostorRoomScreen(onBack = {}, onContinue = {}, gameVm = GameViewModel())
+    val vm = GameViewModel()
+    ImpostorRoomScreen(onBack = {}, onContinue = {}, gameVm = vm)
 }
