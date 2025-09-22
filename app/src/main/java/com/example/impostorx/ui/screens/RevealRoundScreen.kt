@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.impostorx.logic.GameViewModel
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalView
 
 @Composable
 fun RevealRoundScreen(
@@ -37,6 +39,7 @@ fun RevealRoundScreen(
     onAllRevealed: () -> Unit,
     gameVm: GameViewModel
 ) {
+    KeepScreenOn()
     val ctx = LocalContext.current
     val haptics = LocalHapticFeedback.current
 
@@ -210,6 +213,15 @@ private fun PillsProgress(total: Int, revealed: Int) {
         }
     }
 
+}
+
+@Composable
+private fun KeepScreenOn() {
+    val view = LocalView.current
+    DisposableEffect(Unit) {
+        view.keepScreenOn = true
+        onDispose { view.keepScreenOn = false }
+    }
 }
 
 /* ---------- Previews ---------- */
