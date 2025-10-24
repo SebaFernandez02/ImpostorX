@@ -5,11 +5,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,7 +26,7 @@ import com.example.impostorx.ui.components.ScreenTopBar
 @Composable
 fun RoundReadyScreen(
     onBackToImpostors: () -> Unit,
-    onPlayAgain: () -> Unit
+    onPlayAgain: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -28,9 +34,26 @@ fun RoundReadyScreen(
             .background(Color.Black)
             .padding(16.dp)
     ) {
-
-
-        Spacer(Modifier.height(24.dp))
+        // Top bar moderno
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0xFF101010))
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onBackToImpostors) {
+                Icon(Icons.Rounded.ArrowBack, contentDescription = "Volver", tint = Color.White)
+            }
+            Text(
+                "ImpostorX",
+                color = Color.White,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.weight(1f),
+            )
+        }
 
         // Centro
         Box(

@@ -48,7 +48,9 @@ private val defaultCategories = listOf(
     CategoryUi("Deportes",   "Deportes",   "🏅", "Más allá del fútbol"),
     CategoryUi("Artistas",   "Artistas",   "🎨", "Música, cine, etc."),
     CategoryUi("Geografia",  "Geografía",  "🌍", "Países, ciudades…"),
-    CategoryUi("Cine",       "Cine",       "🎬", "Películas y más")
+    CategoryUi("Cine",       "Cine",       "🎬", "Películas y más"),
+    CategoryUi("General",     "General",     "\uD83D\uDC40", "Cosas, profesiones, lugares y mas..."),
+    CategoryUi("BrainRots",  "Brain rots", "\uD83C\uDDEE\uD83C\uDDF9", "Simplemente Brainrots")
 )
 
 @Composable

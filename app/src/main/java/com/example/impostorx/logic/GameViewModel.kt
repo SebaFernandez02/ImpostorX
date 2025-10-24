@@ -119,7 +119,7 @@ class GameViewModel : ViewModel() {
         Phase.ASSIGN -> { phase = Phase.REVEAL; false }
         Phase.REVEAL -> {
             if (currentIndex >= players.lastIndex) true
-            else { currentIndex += 1; phase = Phase.ASSIGN; false }
+            else { phase = Phase.ASSIGN; currentIndex += 1; false }
         }
     }
 }

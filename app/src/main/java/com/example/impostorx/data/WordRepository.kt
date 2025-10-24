@@ -12,7 +12,9 @@ object WordsRepository {
         Deportes("Deportes"),
         Artistas("Artistas"),
         Geografia("Geografia"),
-        Cine("Cine")
+        Cine("Cine"),
+        General("General"),
+        BrainRots("BrainRots")
     }
 
     private fun fileFor(category: Category): String = when (category) {
@@ -22,6 +24,8 @@ object WordsRepository {
         Category.Geografia  -> "palabras/geografia.json"
         Category.Cine       -> "palabras/peliculas.json"
         Category.Random     -> "palabras/random.json"
+        Category.General    -> "palabras/general.json"
+        Category.BrainRots  -> "palabras/brainrots.json"
     }
 
     fun loadWords(context: Context, category: Category): List<String> {
@@ -39,7 +43,9 @@ object WordsRepository {
                 "palabras/deportistas.json",
                 "palabras/artistas.json",
                 "palabras/paises.json",
-                "palabras/peliculas.json"
+                "palabras/peliculas.json",
+                "palabras/general.json",
+                "palabras/brainrots.json"
             )
             val all = mutableListOf<String>()
             files.forEach { f ->

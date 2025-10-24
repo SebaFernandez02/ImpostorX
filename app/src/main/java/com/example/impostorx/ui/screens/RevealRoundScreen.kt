@@ -1,21 +1,19 @@
+// RevealRoundScreen.kt
 package com.example.impostorx.ui.screens
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.SizeTransform
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -23,16 +21,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.impostorx.logic.GameViewModel
-import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalView
-import com.example.impostorx.ui.components.ScreenTopBar
+import androidx.compose.ui.tooling.preview.Preview
+
+
 
 @Composable
 fun RevealRoundScreen(
@@ -79,7 +79,6 @@ fun RevealRoundScreen(
 
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun RevealLayout(
     phase: GameViewModel.Phase,
@@ -98,53 +97,56 @@ private fun RevealLayout(
             .clickable { onTap() }
             .padding(16.dp)
     ) {
-        // Top bar
-
-
-        Spacer(Modifier.height(16.dp))
-
-        // Centro animado (fade + slide up/down según fase)
-        Surface(
+        // Top bar moderno
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
-            color = Color(0xFF111111),
-            shape = RoundedCornerShape(16.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0xFF101010))
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                AnimatedContent(
-                    targetState = phase,
-                    transitionSpec = {
-                        if (initialState == GameViewModel.Phase.ASSIGN && targetState == GameViewModel.Phase.REVEAL) {
-                            (slideInVertically { it / 2 } + fadeIn()) togetherWith
-                                    (slideOutVertically { -it / 2 } + fadeOut())
-                        } else {
-                            (slideInVertically { -it / 2 } + fadeIn()) togetherWith
-                                    (slideOutVertically { it / 2 } + fadeOut())
-                        }.using(SizeTransform(clip = false))
-                    },
-                    label = "revealTransition"
-                ) { state ->
-                    if (state == GameViewModel.Phase.ASSIGN) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Pasar el celular a:", color = Color.White, fontSize = 18.sp)
-                            Spacer(Modifier.height(8.dp))
-                            Text(
-                                playerName,
-                                color = Color.White,
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                    } else {
-                        val text = if (isImpostor) "Sos el Impostor" else (word ?: "Cargando…")
-                        Text(
-                            text,
-                            color = Color.White,
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
+            IconButton(onClick = onBack) {
+                Icon(Icons.Rounded.ArrowBack, contentDescription = "Volver", tint = Color.White)
+            }
+            Text(
+                "ImpostorX",
+                color = Color.White,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.weight(1f),
+            )
+        }
+
+        Spacer(Modifier.height(6.dp))
+
+
+        // Centro
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .background(Color(0xFF111111), RoundedCornerShape(16.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                if (phase == GameViewModel.Phase.ASSIGN) {
+                    Text("Pasar el celular a:", color = Color.White, fontSize = 18.sp)
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        playerName,
+                        color = Color.White,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                } else {
+                    val text = if (isImpostor) "Sos el Impostor" else (word ?: "Cargando…")
+                    Text(
+                        text,
+                        color = Color.White,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
             }
         }
@@ -168,7 +170,6 @@ private fun RevealLayout(
         )
     }
 }
-
 @Composable
 private fun PillsProgress(total: Int, revealed: Int) {
     // Estados:
