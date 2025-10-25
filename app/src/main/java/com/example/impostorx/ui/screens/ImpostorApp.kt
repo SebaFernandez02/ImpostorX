@@ -75,6 +75,7 @@ fun ImpostorApp() {
                             launchSingleTop = true
                         }
                     }
+                    gameVm.reshuffleForNewMatch()
                 },
                 gameVm = gameVm
             )
